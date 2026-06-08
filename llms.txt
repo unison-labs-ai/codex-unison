@@ -1,0 +1,34 @@
+# codex-unison
+
+> Persistent memory for OpenAI Codex CLI — powered by Unison. Wires the Unison brain into Codex CLI's hooks system so your coding agent remembers your stack, preferences, prior decisions, and lessons learned across every project.
+
+Agents: start with [AGENTS.md](AGENTS.md) — it covers install, auth, and usage in one page.
+
+## Docs
+- [README.md](README.md): overview, quickstart, features, configuration reference, commands, skills
+- [AGENTS.md](AGENTS.md): how an AI agent installs, authenticates, and uses this integration; contributing guide
+- [CONTRIBUTING.md](CONTRIBUTING.md): development setup, conventions, PR checklist
+- [SECURITY.md](SECURITY.md): vulnerability reporting and credential handling
+
+## Usage
+Install the hooks into Codex CLI:
+```bash
+npx codex-unison install
+```
+Set your Unison API key:
+```bash
+export UNISON_TOKEN="usk_live_..."
+```
+Start Codex — memory is now active automatically.
+
+## Examples
+```bash
+# Check install status
+npx codex-unison status
+
+# Headless / CI auth (provision a key)
+curl -X POST https://api.unisonlabs.ai/v1/auth/provision \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"you@example.com"}'
+# Then: export UNISON_TOKEN="usk_live_..."
+```
