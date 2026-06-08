@@ -202,7 +202,7 @@ export class UnisonBrainClient {
           kind: opts.kind ?? "note",
           title: opts.title,
           tags: opts.tags,
-          source: { kind: "codex", ref: CODEX_SOURCE },
+          source: { kind: "manual", ref: CODEX_SOURCE },
         }),
         TIMEOUT_MS,
       );
@@ -447,7 +447,9 @@ export class UnisonBrainClient {
   ): Promise<{ success: true; path: string } | { success: false; error: string }> {
     log("addMemory: start", { tag, contentLength: content.length });
 
-    const sessionId = options?.customId || metadata?.sessionId || `session_${Date.now()}`;
+    const rawSessionId = options?.customId || metadata?.sessionId || `session-${Date.now()}`;
+    // Sanitize: replace underscores and any chars not in [a-z0-9\-/.] with hyphens
+    const sessionId = rawSessionId.toLowerCase().replace(/[^a-z0-9\-/.]/g, "-");
     const docPath = `/private/sessions/${sessionId}.md`;
 
     const frontmatter = [

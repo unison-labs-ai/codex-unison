@@ -68,6 +68,20 @@ export interface Credentials {
 
 export { AUTH_BASE_URL, CREDENTIALS_FILE };
 
+function normalizeApiBaseUrl(apiBaseUrl: string | null | undefined): string | undefined {
+  if (!apiBaseUrl) return undefined;
+  try {
+    const url = new URL(apiBaseUrl);
+    if (url.protocol !== "https:" && url.protocol !== "http:") return undefined;
+    url.pathname = url.pathname.replace(/\/+$/, "");
+    url.search = "";
+    url.hash = "";
+    return url.toString().replace(/\/$/, "");
+  } catch {
+    return undefined;
+  }
+}
+
 export function loadCredentialData(): Credentials | null {
   try {
     if (existsSync(CREDENTIALS_FILE)) {
@@ -83,9 +97,11 @@ export function loadCredentials(): string | undefined {
   return undefined;
 }
 
-function saveCredentials(token: string): void {
+function saveCredentials(token: string, apiBaseUrl?: string): void {
   mkdirSync(UNISON_DIR, { recursive: true, mode: 0o700 });
   const credentials: Credentials = { token, savedAt: new Date().toISOString() };
+  const normalizedApiBaseUrl = normalizeApiBaseUrl(apiBaseUrl);
+  if (normalizedApiBaseUrl) credentials.apiBaseUrl = normalizedApiBaseUrl;
   writeFileSync(CREDENTIALS_FILE, JSON.stringify(credentials, null, 2), { mode: 0o600 });
 }
 
@@ -195,9 +211,11 @@ export function startAuthFlow(): Promise<string> {
           url.searchParams.get("token") ||
           url.searchParams.get("apikey") ||
           url.searchParams.get("api_key");
+        const apiBaseUrl =
+          url.searchParams.get("api_url") || url.searchParams.get("api_base_url");
 
         if (token?.startsWith("usk_")) {
-          saveCredentials(token);
+          saveCredentials(token, apiBaseUrl ?? undefined);
           res.writeHead(200, { "Content-Type": "text/html" });
           res.end(AUTH_SUCCESS_HTML);
           resolved = true;

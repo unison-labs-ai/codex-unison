@@ -45,6 +45,11 @@ const SKILLS = [
   { name: "unison-logout", script: "logout.js" },
 ] as const;
 
+const LEGACY_UNISON_SCRIPTS = [
+  "capture.js",
+  "tags.js",
+] as const;
+
 const SCRIPT_DIR = getScriptDir();
 const DIST_HOOKS_DIR = join(SCRIPT_DIR, "hooks");
 
@@ -233,6 +238,12 @@ function install() {
   copyFileSync(recallSrc, RECALL_SCRIPT);
   copyFileSync(flushSrc, FLUSH_SCRIPT);
   copyFileSync(sessionStartSrc, SESSION_START_SCRIPT);
+
+  // Remove script names left by older package layouts.
+  for (const script of LEGACY_UNISON_SCRIPTS) {
+    const oldScript = join(UNISON_HOOKS_DIR, script);
+    if (existsSync(oldScript)) rmSync(oldScript);
+  }
 
   for (const { name, script } of SKILLS) {
     copyFileSync(

@@ -59,6 +59,7 @@ function main(): void {
     console.log("UNISON_TOKEN is still set in this shell, so memory may remain active until you unset it or restart Codex.");
   } else {
     console.log("Unison memory is inactive until you run /unison-login again.");
+    console.log("This only logs out this local Codex install. To revoke the account-level token, visit https://app.unisonlabs.ai.");
   }
 }
 

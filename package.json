@@ -11,7 +11,8 @@
     "build": "node build.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",
-    "test": "bun run build && node --test test/unit.mjs"
+    "test": "bun run build && node --test test/unit.mjs",
+    "test:e2e": "bun run build && node test/e2e-battle-test.mjs"
   },
   "keywords": [
     "codex",
