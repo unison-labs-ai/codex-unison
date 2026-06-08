@@ -1,0 +1,50 @@
+import { readFileSync } from "node:fs";
+import { isConfigured } from "../config.js";
+import { UnisonBrainClient } from "../services/client.js";
+import { getTags } from "../services/tags.js";
+import { log } from "../services/logger.js";
+import { captureEntries, resolveTranscriptPath } from "../services/capture.js";
+import { getSessionId } from "../services/session.js";
+
+interface CodexStopPayload {
+  session_id?: string;
+  transcript_path?: string | null;
+  cwd?: string;
+  [key: string]: unknown;
+}
+
+async function main() {
+  let rawInput = "";
+  try {
+    rawInput = readFileSync(0, "utf-8");
+  } catch {
+    return;
+  }
+
+  if (!isConfigured()) {
+    return;
+  }
+
+  let payload: CodexStopPayload = {};
+  try {
+    payload = JSON.parse(rawInput) as CodexStopPayload;
+  } catch {
+    return;
+  }
+
+  const cwd = payload.cwd || process.cwd();
+  const tags = getTags(cwd);
+  const sessionId = getSessionId(payload.session_id, tags.project);
+
+  const transcriptPath = resolveTranscriptPath(payload.transcript_path, sessionId);
+
+  log("flush: start", { sessionId, transcriptPath });
+
+  const client = new UnisonBrainClient();
+
+  await captureEntries("flush", client, sessionId, transcriptPath, tags);
+}
+
+main()
+  .catch(() => {})
+  .finally(() => process.exit(0));

@@ -1,0 +1,43 @@
+{
+  "name": "codex-unison",
+  "version": "1.0.0",
+  "description": "Persistent memory for OpenAI Codex CLI — powered by Unison.",
+  "type": "module",
+  "main": "dist/cli.js",
+  "bin": {
+    "codex-unison": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit",
+    "test": "bun run build && node --test test/unit.mjs"
+  },
+  "keywords": [
+    "codex",
+    "openai",
+    "unison",
+    "memory",
+    "ai",
+    "coding-agent",
+    "brain"
+  ],
+  "author": "Unison",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/unison-labs-ai/codex-unison"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@iarna/toml": "^2.2.5"
+  },
+  "devDependencies": {
+    "@types/iarna__toml": "^2.0.5",
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.3"
+  }
+}
