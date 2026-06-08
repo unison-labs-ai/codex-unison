@@ -19,6 +19,7 @@ interface CodexUnisonConfig {
   injectProfile?: boolean;
   userTagPrefix?: string;
   projectTagPrefix?: string;
+  filterPrompt?: string;
   debug?: boolean;
   signalExtraction?: boolean;
   signalKeywords?: string[];
@@ -45,6 +46,8 @@ const DEFAULTS = {
   maxMemories: 5,
   maxProfileItems: 5,
   injectProfile: true,
+  filterPrompt:
+    "You are a stateful coding agent. Remember all the information, including but not limited to user's coding preferences, tech stack, behaviours, workflows, and any other relevant details.",
   debug: false,
   signalExtraction: false,
   signalKeywords: DEFAULT_SIGNAL_KEYWORDS,
@@ -99,6 +102,7 @@ export const CONFIG = {
   injectProfile: fileConfig.injectProfile ?? DEFAULTS.injectProfile,
   userTagPrefix: fileConfig.userTagPrefix,
   projectTagPrefix: fileConfig.projectTagPrefix,
+  filterPrompt: fileConfig.filterPrompt ?? DEFAULTS.filterPrompt,
   debug: fileConfig.debug ?? DEFAULTS.debug,
   signalExtraction: fileConfig.signalExtraction ?? DEFAULTS.signalExtraction,
   signalKeywords: fileConfig.signalKeywords ?? DEFAULTS.signalKeywords,
@@ -139,6 +143,10 @@ export function getSignalConfig(): {
     keywords: CONFIG.signalKeywords.map((k) => k.toLowerCase()),
     turnsBefore: CONFIG.signalTurnsBefore,
   };
+}
+
+export function getFilterPrompt(): string {
+  return CONFIG.filterPrompt;
 }
 
 export function getTagCatalog(): string | null {
