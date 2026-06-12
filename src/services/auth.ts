@@ -30,7 +30,7 @@ const AUTH_BASE_URL =
     : "https://app.unisonlabs.ai/auth/agent-connect";
 
 const API_BASE_URL =
-  process.env.UNISON_API_URL?.replace(/\/+$/, "") ?? "https://api.unisonlabs.ai";
+  process.env.UNISON_API_URL?.replace(/\/+$/, "") ?? "https://brain.unisonlabs.ai";
 
 const AUTH_TIMEOUT = Number(process.env.UNISON_AUTH_TIMEOUT) || 5 * 60_000;
 

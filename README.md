@@ -76,7 +76,7 @@ anything else fails, they exit cleanly without breaking your Codex session.
 | Variable          | Purpose                                                          |
 | ----------------- | ---------------------------------------------------------------- |
 | `UNISON_TOKEN`    | Your Unison API token (`usk_live_...`). Env var takes precedence over credentials file. |
-| `UNISON_API_URL`  | Override the Unison API base URL (default: `https://api.unisonlabs.ai`). |
+| `UNISON_API_URL`  | Override the Unison API base URL (default: `https://brain.unisonlabs.ai`). |
 | `UNISON_APP_URL`  | Override the Unison app URL for browser auth (default: `https://app.unisonlabs.ai`). |
 | `UNISON_DEBUG`    | Set to any truthy value to enable debug logging to `~/.codex-unison.log`. |
 
@@ -163,13 +163,13 @@ If you can't use a browser (CI, remote server), use the three-step machine-auth 
 
 ```bash
 # 1. Provision an account (sends OTP to your email)
-curl -X POST https://api.unisonlabs.ai/v1/auth/provision \
+curl -X POST https://brain.unisonlabs.ai/v1/auth/provision \
   -H 'Content-Type: application/json' \
   -d '{"email":"you@example.com"}'
 # Returns: {"apiKey":"usk_live_...","tenantId":"...","status":"unverified","emailSent":true}
 
 # 2. Verify with the OTP from your email
-curl -X POST https://api.unisonlabs.ai/v1/auth/verify \
+curl -X POST https://brain.unisonlabs.ai/v1/auth/verify \
   -H 'Content-Type: application/json' \
   -d '{"email":"you@example.com","code":"123456"}'
 # Returns: {"verified":true,"tenantId":"..."}

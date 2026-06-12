@@ -35,7 +35,7 @@ if (!API_TOKEN) {
   process.exit(1);
 }
 
-const API_URL = process.env.UNISON_API_URL || "https://api.unisonlabs.ai";
+const API_URL = process.env.UNISON_API_URL || "https://brain.unisonlabs.ai";
 
 const REPO_ROOT = fileURLToPath(new URL("..", import.meta.url)).replace(/\/$/, "");
 const CLI_BIN = join(REPO_ROOT, "dist", "cli.js");
