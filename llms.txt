@@ -27,7 +27,7 @@ Start Codex — memory is now active automatically.
 npx codex-unison status
 
 # Headless / CI auth (provision a key)
-curl -X POST https://api.unisonlabs.ai/v1/auth/provision \
+curl -X POST https://brain.unisonlabs.ai/v1/auth/provision \
   -H 'Content-Type: application/json' \
   -d '{"email":"you@example.com"}'
 # Then: export UNISON_TOKEN="usk_live_..."

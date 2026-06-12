@@ -129,7 +129,7 @@ export function getApiBaseUrl(): string {
   return (
     process.env.UNISON_API_URL ||
     loadCredentialData()?.apiBaseUrl ||
-    "https://api.unisonlabs.ai"
+    "https://brain.unisonlabs.ai"
   );
 }
 

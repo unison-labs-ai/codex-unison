@@ -44,7 +44,7 @@ opens automatically on the first prompt.
 
 ```bash
 # 1. Provision an account
-curl -X POST https://api.unisonlabs.ai/v1/auth/provision \
+curl -X POST https://brain.unisonlabs.ai/v1/auth/provision \
   -H 'Content-Type: application/json' \
   -d '{"email":"you@example.com"}'
 # Returns: {"apiKey":"usk_live_...","tenantId":"..."}
