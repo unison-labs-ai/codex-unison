@@ -1,31 +1,35 @@
+<div align="center">
+
+<img src="https://raw.githubusercontent.com/unison-labs-ai/unison-brain/main/assets/brain.svg" width="140" alt="Unison Brain" />
+
 # codex-unison
 
-> Persistent memory for OpenAI Codex CLI — powered by [Unison](https://unisonlabs.ai)
+**Codex starts every session from zero. Stop re-explaining your codebase.**
 
-Codex forgets every session. `codex-unison` wires the Unison brain into Codex CLI's
-hooks system so your coding agent remembers your stack, preferences, prior decisions,
-and the lessons learned across every project — automatically.
+Persistent memory for [OpenAI Codex CLI](https://github.com/openai/codex) — powered by the [Unison brain](https://unisonlabs.ai).
 
-## Features
+[![CI](https://github.com/unison-labs-ai/codex-unison/actions/workflows/ci.yml/badge.svg)](https://github.com/unison-labs-ai/codex-unison/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+[![Stars](https://img.shields.io/github/stars/unison-labs-ai/codex-unison?style=social)](https://github.com/unison-labs-ai/codex-unison)
 
-- **Automatic recall** — relevant memories are injected into every prompt via the
-  `UserPromptSubmit` hook.
-- **Automatic capture** — conversations are stored incrementally (every N turns) and
-  at session end via the `Stop` hook.
-- **Project + user scoping** — memories are tagged per-project and per-user so
-  context never leaks across repos.
-- **Custom tag routing** — define custom memory tags (e.g., `work`, `personal`,
-  `code_style`). The AI automatically picks the right tag based on your instructions
-  when saving, searching, or forgetting memories.
-- **Privacy-aware** — anything wrapped in `<private>...</private>` is redacted
-  before being sent to Unison.
-- **Zero-config install** — one command sets up `~/.codex/config.toml` and
-  `~/.codex/hooks.json` for you.
-- **No runtime deps in hooks** — the hook scripts are pre-bundled with esbuild for
-  fast cold starts.
-- **Fallback skills** — explicit `/unison-search`, `/unison-save`, `/unison-forget`,
-  `/unison-profile`, `/unison-status`, `/unison-login`, and `/unison-logout` commands
-  available when hooks don't cover your use case.
+[**Why**](#with-unison-vs-without) • [**Quickstart**](#quick-start) • [**How it works**](#how-it-works) • [**Configuration**](#configuration) • [**Skills**](#skills-fallback-commands) • [**Auth**](#authentication)
+
+</div>
+
+---
+
+Codex forgets everything the moment you close the terminal. `codex-unison` wires the [Unison brain](https://unisonlabs.ai) into Codex CLI's hooks system so your coding agent remembers your stack, preferences, prior decisions, and the lessons learned across every project — automatically, without changing how you work.
+
+### With Unison vs. without
+
+| Without Unison | With Unison |
+|---|---|
+| Every session starts blank — you re-explain your stack, your preferences, your decisions | Codex opens with full context: architecture choices, code style, what you tried last time |
+| Lessons learned in one repo vanish when you switch repos | Memories are scoped per-project _and_ per-user — they travel with you, not the terminal |
+| You catch yourself repeating "we use Bun, not npm" for the fifth time | Captured automatically — every N turns and at session end, zero extra keystrokes |
+| Secrets or sensitive content accidentally end up in context | `<private>...</private>` wrapping redacts before anything leaves your machine |
+
+---
 
 ## Quick start
 
@@ -44,20 +48,22 @@ and the lessons learned across every project — automatically.
 
 3. **That's it — memory is active.**
 
+---
+
 ## How it works
 
 Codex CLI supports a hooks system that lets external scripts run at specific
 lifecycle events. `codex-unison` registers three hooks:
 
-| Hook              | Event                  | What it does                                                        |
-| ----------------- | ---------------------- | ------------------------------------------------------------------- |
-| `session-start`   | `SessionStart`         | Loads the user's memory profile at the start of every session.      |
-| `recall`          | `UserPromptSubmit`     | Captures new turns (every N prompts), then searches the Unison brain for relevant memories, injecting them into the prompt as `additionalContext`. |
-| `flush`           | `Stop`                 | Captures any remaining turns at session end so the final conversation turns are never lost. |
+| Hook | Event | What it does |
+|---|---|---|
+| `session-start` | `SessionStart` | Loads the user's memory profile at the start of every session. |
+| `recall` | `UserPromptSubmit` | Captures new turns (every N prompts), then searches the Unison brain for relevant memories, injecting them into the prompt as `additionalContext`. |
+| `flush` | `Stop` | Captures any remaining turns at session end so the final conversation turns are never lost. |
 
 **Incremental capture**: Memories are saved every N turns (default: 3) during the
-session. This means memories from earlier in your session are immediately available
-for recall in the same session.
+session. Memories from earlier in your session are immediately available for recall
+in the same session.
 
 The installer:
 
@@ -69,42 +75,7 @@ The installer:
 The hooks are tolerant: if the Unison brain is unreachable, the token is missing, or
 anything else fails, they exit cleanly without breaking your Codex session.
 
-## Configuration
-
-### Environment variables
-
-| Variable          | Purpose                                                          |
-| ----------------- | ---------------------------------------------------------------- |
-| `UNISON_TOKEN`    | Your Unison API token (`usk_live_...`). Env var takes precedence over credentials file. |
-| `UNISON_API_URL`  | Override the Unison API base URL (default: `https://brain.unisonlabs.ai`). |
-| `UNISON_APP_URL`  | Override the Unison app URL for browser auth (default: `https://app.unisonlabs.ai`). |
-| `UNISON_DEBUG`    | Set to any truthy value to enable debug logging to `~/.codex-unison.log`. |
-
-### `~/.codex/unison.json` (optional)
-
-Drop this file to override defaults:
-
-| Key                      | Type       | Default        | Description                                                                                  |
-| ------------------------ | ---------- | -------------- | -------------------------------------------------------------------------------------------- |
-| `token`                  | `string`   | —              | API token (env var takes precedence, browser auth is preferred).                              |
-| `similarityThreshold`    | `number`   | `0.6`          | Minimum similarity score for retrieved memories.                                             |
-| `maxMemories`            | `number`   | `5`            | Max memories injected per prompt.                                                            |
-| `maxProfileItems`        | `number`   | `5`            | Max profile items considered.                                                                |
-| `injectProfile`          | `boolean`  | `true`         | Whether to fetch and inject the user profile.                                                |
-| `userTagPrefix`          | `string`   | auto           | Override the user memory tag.                                                                |
-| `projectTagPrefix`       | `string`   | auto (per-repo) | Override the project memory tag.                                                            |
-| `debug`                  | `boolean`  | `false`        | Enable debug logging.                                                                        |
-| `captureEveryNTurns`     | `number`   | `3`            | Save memories every N turns (0 = session-end only).                                          |
-| `signalExtraction`       | `boolean`  | `false`        | Enable signal-based filtering (only capture turns with keywords like "prefer", "decided").   |
-| `signalKeywords`         | `string[]` | (defaults)     | Keywords that trigger signal extraction.                                                     |
-| `signalTurnsBefore`      | `number`   | `3`            | Include N turns before a signal for context.                                                 |
-| `enableCustomTags`       | `boolean`  | `false`        | Enable AI-driven routing to custom tags.                                                     |
-| `customTags`             | `array`    | `[]`           | Custom tags with `tag` and `description` (see below).                                        |
-| `customTagInstructions`  | `string`   | `""`           | Free-text instructions for the AI on how to route memories to tags.                          |
-
-User tags are auto-derived from your `git config user.email`. Project tags are
-derived from the Git common directory when available, so linked worktrees share one
-project tag by default. Set `UNISON_ISOLATE_WORKTREES=true` to keep each worktree isolated.
+---
 
 ## Commands
 
@@ -114,28 +85,69 @@ npx codex-unison uninstall   # remove hooks + config (keeps your memories in Uni
 npx codex-unison status      # show current install status
 ```
 
+---
+
+## Configuration
+
+### Environment variables
+
+| Variable | Purpose |
+|---|---|
+| `UNISON_TOKEN` | Your Unison API token (`usk_live_...`). Env var takes precedence over credentials file. |
+| `UNISON_API_URL` | Override the Unison API base URL (default: `https://brain.unisonlabs.ai`). |
+| `UNISON_APP_URL` | Override the Unison app URL for browser auth (default: `https://app.unisonlabs.ai`). |
+| `UNISON_DEBUG` | Set to any truthy value to enable debug logging to `~/.codex-unison.log`. |
+
+### `~/.codex/unison.json` (optional)
+
+Drop this file to override defaults:
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `token` | `string` | — | API token (env var takes precedence, browser auth is preferred). |
+| `similarityThreshold` | `number` | `0.6` | Minimum similarity score for retrieved memories. |
+| `maxMemories` | `number` | `5` | Max memories injected per prompt. |
+| `maxProfileItems` | `number` | `5` | Max profile items considered. |
+| `injectProfile` | `boolean` | `true` | Whether to fetch and inject the user profile. |
+| `userTagPrefix` | `string` | auto | Override the user memory tag. |
+| `projectTagPrefix` | `string` | auto (per-repo) | Override the project memory tag. |
+| `debug` | `boolean` | `false` | Enable debug logging. |
+| `captureEveryNTurns` | `number` | `3` | Save memories every N turns (0 = session-end only). |
+| `signalExtraction` | `boolean` | `false` | Enable signal-based filtering (only capture turns with keywords like "prefer", "decided"). |
+| `signalKeywords` | `string[]` | (defaults) | Keywords that trigger signal extraction. |
+| `signalTurnsBefore` | `number` | `3` | Include N turns before a signal for context. |
+| `enableCustomTags` | `boolean` | `false` | Enable AI-driven routing to custom tags. |
+| `customTags` | `array` | `[]` | Custom tags with `tag` and `description` (see below). |
+| `customTagInstructions` | `string` | `""` | Free-text instructions for the AI on how to route memories to tags. |
+
+User tags are auto-derived from your `git config user.email`. Project tags are
+derived from the Git common directory when available, so linked worktrees share one
+project tag by default. Set `UNISON_ISOLATE_WORKTREES=true` to keep each worktree isolated.
+
+---
+
 ## Skills (fallback commands)
 
 These Codex skills are available as explicit commands when you need more control.
 All memory skills support `--tag <tag>` to target a specific custom tag.
 
-| Skill             | Usage                                                  | Description                              |
-| ----------------- | ------------------------------------------------------ | ---------------------------------------- |
-| `/unison-search`  | `/unison-search [--tag <tag>] <query>`                 | Search memories manually.                |
-| `/unison-save`    | `/unison-save [--tag <tag>] <content>`                 | Save a specific memory explicitly.       |
-| `/unison-forget`  | `/unison-forget [--tag <tag>] <content>`               | Remove a memory.                         |
-| `/unison-profile` | `/unison-profile`                                      | Show remembered profile facts.           |
-| `/unison-status`  | `/unison-status`                                       | Show connection and account status.      |
-| `/unison-login`   | `/unison-login`                                        | Re-authenticate with Unison.             |
-| `/unison-logout`  | `/unison-logout`                                       | Remove saved local credentials.          |
+| Skill | Usage | Description |
+|---|---|---|
+| `/unison-search` | `/unison-search [--tag <tag>] <query>` | Search memories manually. |
+| `/unison-save` | `/unison-save [--tag <tag>] <content>` | Save a specific memory explicitly. |
+| `/unison-forget` | `/unison-forget [--tag <tag>] <content>` | Remove a memory. |
+| `/unison-profile` | `/unison-profile` | Show remembered profile facts. |
+| `/unison-status` | `/unison-status` | Show connection and account status. |
+| `/unison-login` | `/unison-login` | Re-authenticate with Unison. |
+| `/unison-logout` | `/unison-logout` | Remove saved local credentials. |
 
-## Custom Tags
+---
+
+## Custom tags
 
 Custom tags let you organize memories into separate buckets (e.g., `work`,
 `personal`, `code_style`). The AI reads the tag descriptions from your config
 and automatically picks the right tag when saving memories.
-
-### Setup
 
 Add these fields to `~/.codex/unison.json`:
 
@@ -150,6 +162,8 @@ Add these fields to `~/.codex/unison.json`:
   "customTagInstructions": "Route coding preferences to code_style. Personal topics to personal. Default to project tag for ambiguous content."
 }
 ```
+
+---
 
 ## Authentication
 
@@ -180,21 +194,49 @@ export UNISON_TOKEN="usk_live_..."
 
 For existing verified accounts, use `/v1/auth/request-key` to recover your key.
 
+---
+
 ## Privacy
 
 Anything wrapped in `<private>...</private>` is replaced with `[REDACTED]` before
 being sent to Unison. Use this for secrets, tokens, or anything you'd rather
 not have stored.
 
-## How the brain API works
+---
 
-All memory operations hit the Unison brain REST API at `${UNISON_API_URL}/v1/brain/*`.
-The token is sent as `Authorization: Bearer usk_live_...` on every request.
+## Star history
 
-Documents are stored under `/private/sessions/<session-id>.md` per session and
-tagged with the user's derived tag (sha256 of git email) and the project's tag
-(sha256 of git root path). Brain user scopes are `/private/` and `/workspace/`
-(plus read-only `/system/`). Search uses the brain's hybrid keyword + semantic index.
+<div align="center">
+
+[![Star History Chart](https://api.star-history.com/svg?repos=unison-labs-ai/codex-unison&type=Date)](https://star-history.com/#unison-labs-ai/codex-unison&Date)
+
+If this saves you a re-explanation, consider leaving a star.
+
+</div>
+
+---
+
+## Part of the Unison Labs constellation
+
+**One brain, every agent.** Every repo below reads from _and writes to_ the same [Unison brain](https://unisonlabs.ai) — no per-tool memory silos.
+
+| Repo | What it does |
+|---|---|
+| [unison-brain](https://github.com/unison-labs-ai/unison-brain) | CLI · SDK · MCP server — the core |
+| [claude-unison](https://github.com/unison-labs-ai/claude-unison) | Memory for Claude Code |
+| [cursor-unison](https://github.com/unison-labs-ai/cursor-unison) | Memory for Cursor |
+| **[codex-unison](https://github.com/unison-labs-ai/codex-unison)** | **Memory for OpenAI Codex CLI ← you are here** |
+| [opencode-unison](https://github.com/unison-labs-ai/opencode-unison) | Memory for OpenCode |
+| [openclaw-unison](https://github.com/unison-labs-ai/openclaw-unison) | Memory for OpenClaw |
+| [pipecat-unison](https://github.com/unison-labs-ai/pipecat-unison) | Memory for Pipecat voice agents |
+| [python-sdk](https://github.com/unison-labs-ai/python-sdk) | Python SDK for the brain |
+| [install-mcp](https://github.com/unison-labs-ai/install-mcp) | One-command MCP installer |
+| [code-chunk](https://github.com/unison-labs-ai/code-chunk) | AST-aware code chunking |
+| [unison-fs](https://github.com/unison-labs-ai/unison-fs) | Mount the brain as a filesystem |
+| [backchannel](https://github.com/unison-labs-ai/backchannel) | Async messaging between agents |
+| [Unison-evals](https://github.com/unison-labs-ai/Unison-evals) | Open memory benchmark suite |
+
+---
 
 ## License
 
