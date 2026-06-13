@@ -55,6 +55,6 @@ export interface BrainStatus {
 
 export interface WhoAmIResponse {
   user: { id: string; email: string };
-  tenant: { id: string; name: string; verified: boolean };
+  workspace: { id: string; name: string; verified: boolean };
   scopes: string[];
 }
