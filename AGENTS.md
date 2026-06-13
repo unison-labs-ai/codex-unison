@@ -24,7 +24,9 @@ memory backed by the Unison brain:
 
 Memory is stored as documents under `/private/sessions/<session-id>.md` in the Unison
 brain, tagged with the user's tag (sha256 of git email) and the project's tag (sha256
-of git root), so context never leaks across repos or users.
+of git root), so context never leaks across repos or users. Brain user scopes are
+`/private/` and `/workspace/` (plus read-only `/system/`). Teams live under
+`/workspace/teams/<slug>/` inside the workspace scope.
 
 ### Install (one command)
 
@@ -47,7 +49,7 @@ opens automatically on the first prompt.
 curl -X POST https://brain.unisonlabs.ai/v1/auth/provision \
   -H 'Content-Type: application/json' \
   -d '{"email":"you@example.com"}'
-# Returns: {"apiKey":"usk_live_...","tenantId":"..."}
+# Returns: {"apiKey":"usk_live_...","workspaceId":"..."}
 
 # 2. Set the token
 export UNISON_TOKEN="usk_live_..."

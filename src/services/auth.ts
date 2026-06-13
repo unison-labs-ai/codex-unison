@@ -2,8 +2,8 @@
  * Unison auth service.
  *
  * Machine-auth (headless): 3-step flow
- *   1. POST /v1/auth/provision  { email } → { apiKey, tenantId, status, emailSent }
- *   2. POST /v1/auth/verify     { email, code } → { verified, tenantId } or { verified, apiKey }
+ *   1. POST /v1/auth/provision  { email } → { apiKey, workspaceId, status, emailSent }
+ *   2. POST /v1/auth/verify     { email, code } → { verified, workspaceId } or { verified, apiKey }
  *   3. POST /v1/auth/request-key (key recovery for verified accounts)
  *
  * Browser / callback flow: opens a local HTTP server that catches the OAuth
@@ -112,7 +112,7 @@ function saveCredentials(token: string, apiBaseUrl?: string): void {
  */
 export async function provisionAccount(email: string): Promise<{
   apiKey: string;
-  tenantId: string;
+  workspaceId: string;
   status: string;
   emailSent: boolean;
   message: string;
@@ -134,7 +134,7 @@ export async function provisionAccount(email: string): Promise<{
 
   return resp.json() as Promise<{
     apiKey: string;
-    tenantId: string;
+    workspaceId: string;
     status: string;
     emailSent: boolean;
     message: string;
@@ -143,13 +143,13 @@ export async function provisionAccount(email: string): Promise<{
 
 /**
  * Verify the emailed OTP for the given email.
- * First-time: returns { verified, tenantId }
- * Recovery: returns { verified, apiKey, tenantId }
+ * First-time: returns { verified, workspaceId }
+ * Recovery: returns { verified, apiKey, workspaceId }
  */
 export async function verifyAccount(email: string, code: string): Promise<{
   verified: boolean;
   apiKey?: string;
-  tenantId: string;
+  workspaceId: string;
 }> {
   const resp = await fetch(`${API_BASE_URL}/v1/auth/verify`, {
     method: "POST",
@@ -167,7 +167,7 @@ export async function verifyAccount(email: string, code: string): Promise<{
   return resp.json() as Promise<{
     verified: boolean;
     apiKey?: string;
-    tenantId: string;
+    workspaceId: string;
   }>;
 }
 

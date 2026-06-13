@@ -184,7 +184,7 @@ export class UnisonBrainClient {
 
   /**
    * Write or create a brain document.
-   * Path must end in .md and be under /private/, /tenant/, or /teams/<slug>/.
+   * Path must end in .md and be under /private/, /workspace/, or /workspace/teams/<slug>/.
    */
   async writeDoc(opts: {
     path: string;
@@ -315,7 +315,7 @@ export class UnisonBrainClient {
   async whoami(): Promise<{
     success: true;
     user: { id: string; email: string };
-    tenant: { id: string; name: string; verified: boolean };
+    workspace: { id: string; name: string; verified: boolean };
     scopes: string[];
   } | { success: false; error: string }> {
     log("whoami: start");
@@ -323,7 +323,7 @@ export class UnisonBrainClient {
       const result = await withTimeout(
         this.request<{
           user: { id: string; email: string };
-          tenant: { id: string; name: string; verified: boolean };
+          workspace: { id: string; name: string; verified: boolean };
           scopes: string[];
         }>("GET", "auth/whoami"),
         TIMEOUT_MS,

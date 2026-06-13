@@ -69,8 +69,8 @@ async function main(): Promise<void> {
     lines.push("Account:");
     lines.push(`  Email: ${whoamiResult.user.email}`);
     lines.push(`  User ID: ${whoamiResult.user.id}`);
-    lines.push(`  Tenant: ${whoamiResult.tenant.name} (${whoamiResult.tenant.id})`);
-    lines.push(`  Verified: ${whoamiResult.tenant.verified ? "yes" : "no"}`);
+    lines.push(`  Workspace: ${whoamiResult.workspace.name} (${whoamiResult.workspace.id})`);
+    lines.push(`  Verified: ${whoamiResult.workspace.verified ? "yes" : "no"}`);
     lines.push(`  Scopes: ${whoamiResult.scopes.join(", ")}`);
   }
 

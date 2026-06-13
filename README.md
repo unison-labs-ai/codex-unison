@@ -166,13 +166,13 @@ If you can't use a browser (CI, remote server), use the three-step machine-auth 
 curl -X POST https://brain.unisonlabs.ai/v1/auth/provision \
   -H 'Content-Type: application/json' \
   -d '{"email":"you@example.com"}'
-# Returns: {"apiKey":"usk_live_...","tenantId":"...","status":"unverified","emailSent":true}
+# Returns: {"apiKey":"usk_live_...","workspaceId":"...","status":"unverified","emailSent":true}
 
 # 2. Verify with the OTP from your email
 curl -X POST https://brain.unisonlabs.ai/v1/auth/verify \
   -H 'Content-Type: application/json' \
   -d '{"email":"you@example.com","code":"123456"}'
-# Returns: {"verified":true,"tenantId":"..."}
+# Returns: {"verified":true,"workspaceId":"..."}
 
 # 3. Set the token
 export UNISON_TOKEN="usk_live_..."
@@ -193,7 +193,8 @@ The token is sent as `Authorization: Bearer usk_live_...` on every request.
 
 Documents are stored under `/private/sessions/<session-id>.md` per session and
 tagged with the user's derived tag (sha256 of git email) and the project's tag
-(sha256 of git root path). Search uses the brain's hybrid keyword + semantic index.
+(sha256 of git root path). Brain user scopes are `/private/` and `/workspace/`
+(plus read-only `/system/`). Search uses the brain's hybrid keyword + semantic index.
 
 ## License
 
