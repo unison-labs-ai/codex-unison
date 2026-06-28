@@ -199,7 +199,7 @@ export class UnisonBrainClient {
         this.request<BrainDocument>("PUT", "brain/doc", {
           path: opts.path,
           bodyMd: opts.bodyMd,
-          kind: opts.kind ?? "note",
+          kind: opts.kind ?? "wiki_page",
           title: opts.title,
           tags: opts.tags,
           source: { kind: "manual", ref: CODEX_SOURCE },
@@ -473,7 +473,7 @@ export class UnisonBrainClient {
         const editResult = await this.writeDoc({
           path: docPath,
           bodyMd: newBody,
-          kind: "note",
+          kind: "wiki_page",
           tags: [tag, "codex-session"],
         });
         log("addMemory: updated existing doc", { path: docPath });
@@ -485,7 +485,7 @@ export class UnisonBrainClient {
       const writeResult = await this.writeDoc({
         path: docPath,
         bodyMd,
-        kind: "note",
+        kind: "wiki_page",
         tags: [tag, "codex-session"],
       });
       log("addMemory: created new doc", { path: docPath });
