@@ -718,9 +718,9 @@ describe("memory deduplication by path", () => {
   test("deduplicates by path when available", () => {
     const seen = new Set();
     const memories = [
-      { path: "/private/sessions/s1.md", memory: "React components" },
-      { path: "/private/sessions/s1.md", memory: "react components duplicate" },
-      { path: "/private/sessions/s2.md", memory: "Vue components" },
+      { path: "/private/notes/session-s1.md", memory: "React components" },
+      { path: "/private/notes/session-s1.md", memory: "react components duplicate" },
+      { path: "/private/notes/session-s2.md", memory: "Vue components" },
     ];
 
     const result = memories.filter(m => {
@@ -754,8 +754,8 @@ describe("memory deduplication by path", () => {
   test("does not over-deduplicate when paths differ but content matches", () => {
     const seen = new Set();
     const memories = [
-      { path: "/private/sessions/s1.md", memory: "React components" },
-      { path: "/private/sessions/s2.md", memory: "React components" },
+      { path: "/private/notes/session-s1.md", memory: "React components" },
+      { path: "/private/notes/session-s2.md", memory: "React components" },
     ];
 
     const result = memories.filter(m => {

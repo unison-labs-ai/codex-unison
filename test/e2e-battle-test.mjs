@@ -328,9 +328,9 @@ if (forgetResult.stderr.trim()) console.log("  stderr:", forgetResult.stderr.tri
 record("forget exits 0", forgetResult.status === 0, `exit code: ${forgetResult.status}`);
 const forgetWorked = forgetResult.stdout.includes("Memory forgotten");
 const forgetGotNotFound = forgetResult.stdout.includes("not found") || forgetResult.stdout.includes("No matching");
-// Session-path docs (/private/sessions/) have API-level deletion restrictions —
-// the DELETE endpoint only allows contract paths. "Failed to delete document" is
-// an expected outcome when the matched doc lives in a non-deletable path.
+// Notes written under /private/notes/ are standard deletable docs.
+// "Failed to delete document" is still accepted as a fallback in case the
+// search matched a doc the tenant cannot delete.
 const forgetGotPathRestriction = forgetResult.stdout.includes("Failed to delete document") || forgetResult.stdout.includes("not a contract path");
 record("forget completes (success or expected not-found or path restriction)", forgetWorked || forgetGotNotFound || forgetGotPathRestriction, forgetResult.stdout.trim());
 
