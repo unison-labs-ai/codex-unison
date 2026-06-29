@@ -436,7 +436,7 @@ export class UnisonBrainClient {
 
   /**
    * Save a memory to the brain.
-   * Writes a document under /private/sessions/<sessionId>.md, appending
+   * Writes a document under /private/notes/session-<sessionId>.md, appending
    * content incrementally (PATCH if exists, PUT otherwise).
    */
   async addMemory(
@@ -450,7 +450,7 @@ export class UnisonBrainClient {
     const rawSessionId = options?.customId || metadata?.sessionId || `session-${Date.now()}`;
     // Sanitize: replace underscores and any chars not in [a-z0-9\-/.] with hyphens
     const sessionId = rawSessionId.toLowerCase().replace(/[^a-z0-9\-/.]/g, "-");
-    const docPath = `/private/sessions/${sessionId}.md`;
+    const docPath = `/private/notes/session-${sessionId}.md`;
 
     const frontmatter = [
       "---",

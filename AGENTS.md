@@ -22,7 +22,7 @@ memory backed by the Unison brain:
 | `recall` | `UserPromptSubmit` | Captures new turns (every N prompts) then searches the brain for relevant memories, injecting them as `additionalContext` |
 | `flush` | `Stop` | Saves remaining turns at session end so nothing is lost |
 
-Memory is stored as documents under `/private/sessions/<session-id>.md` in the Unison
+Memory is stored as documents under `/private/notes/session-<id>.md` in the Unison
 brain, tagged with the user's tag (sha256 of git email) and the project's tag (sha256
 of git root), so context never leaks across repos or users. Brain user scopes are
 `/private/` and `/workspace/` (plus read-only `/system/`). Teams live under
